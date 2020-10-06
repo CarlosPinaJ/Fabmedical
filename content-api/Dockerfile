@@ -1,22 +1,37 @@
-FROM node:dubnium-alpine AS base
-RUN apk -U add curl
-WORKDIR /usr/src/app
-EXPOSE 3000
+FROM node:alpine AS base
 
-FROM node:dubnium AS build
-RUN npm install -g @angular/cli@~8.3.4
+ RUN apk -U add curl
 
-WORKDIR /usr/src/app
+ WORKDIR /usr/src/app
+
+ EXPOSE 3001
+
+
+
+FROM node:argon AS build
+
+ WORKDIR /usr/src/app
+
+
 
 # Install app dependencies
-COPY package.json /usr/src/app/
-RUN npm install
+
+ COPY package.json /usr/src/app/
+
+ RUN npm install
+
+
 
 # Bundle app source
-COPY . /usr/src/app
-RUN ng build 
 
-FROM base as final
-WORKDIR /usr/src/app
-COPY --from=build /usr/src/app .
-CMD [ "node", "app.js" ]
+ COPY . /usr/src/app
+
+
+
+FROM base AS final
+
+ WORKDIR /usr/src/app
+
+ COPY --from=build /usr/src/app .
+
+ CMD [ "npm", "start" ]
